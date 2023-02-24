@@ -104,7 +104,13 @@ def criaProducoesToken():
 	global automato
 	
 	linha = tokens.split("\n")	
+	print('criaProducoesToken: Construção do AFND')
+	x = 0
 	for i in linha:
+		print('Passo ' , x)
+		print(automato)
+		print()
+		x+=1
 		if i != '':	    # cada token
 			cont = 0
 			for j in i: # cada caractere do token
@@ -154,26 +160,24 @@ def determiniza():
 	global automatoAux
 	global estVisit
 	global estVisitOrd
-	
+	print('Determinização\n')
 	automatoAux = automato
 
 	ordemDeterm = []
 	ordemDetermX = set()
 	insList(ordemDeterm, listNTerm[0])
-
 	automatoDet[listNTerm[0]] = automato[listNTerm[0]] # automato de S
-
 	while 1:
 		if ordemDeterm == '' or ordemDeterm == []:
 			return
-		
 		if ordemDeterm[0] not in estVisit:
 			estVisitOrd.append(ordemDeterm[0])
 		estVisit.add(ordemDeterm[0])		
-
 		print("Estados visitados")
 		print(estVisit)
 		print(estVisitOrd , '\n')
+		# print(ordemDeterm[0])
+		#print(automatoAux[ordemDeterm[0]])
 
 		for terminal in listTerm:			
 			if str(automatoAux[ordemDeterm[0]][1]).find(terminal) != -1: # este terminal existe neste estado
@@ -190,6 +194,9 @@ def determiniza():
 				determinizaLinha(ordemDeterm[0])
 			if ordemDeterm[0] != '':
 				automatoDet[ordemDeterm[0]] = automatoAux[ordemDeterm[0]]
+		# printAFD2(0, 1, automato, listNTerm, "\n\n Automato Finito Não Determinístico")
+		# print(automatoDet)
+		printAFD(0, 1, automatoDet, estVisitOrd, "\n\n Passo a passo")
 
 def determinizaLinha(estado):
 	global listTerm
@@ -217,9 +224,11 @@ def determinizaLinha(estado):
 def minimiza(): 
 	global estVisitOrd
 	# Mortos
-	for estado in estVisitOrd:	
-		eliMortos(estado)
-
+	try:
+		for estado in estVisitOrd:	
+			eliMortos(estado)
+	except:
+		pass
 def eliMortos(estado):
 	global listTerm
 	global automatoDet
@@ -250,6 +259,11 @@ def eliProdMortos(estado, qtd):
 					if automatoDet[automatoDet[estado][1][terminal]][0] == 0: # nao eh final
 						listMortos.add(automatoDet[estado][1][terminal]) # segundo estado do loop
 
+
+
+
+
+		
 def printAFD(tipo, eMorto, automato, listNTerm, mensagem):
 	global listTerm
 	global conteudoArquivo
@@ -258,7 +272,8 @@ def printAFD(tipo, eMorto, automato, listNTerm, mensagem):
 	for i in listNTerm:
 		for j in listTerm:
 			if str(automatoPrint[i][1]).find(j) == -1 or automatoPrint[i][1][j] == '':
-				automatoPrint[i][1][j] = '  X'
+				automatoPrint[i][1][j] = ''
+				
 
 	matriz = str(mensagem)+'\n\n'
 	matriz = str(matriz)+' |  δ\t'
@@ -289,7 +304,8 @@ def printAFD(tipo, eMorto, automato, listNTerm, mensagem):
 
 	print(matriz)
 
-f = open('entrada.in', 'rb')
+
+f = open('entrada_3.in', 'rb')
 f.seek(0)
 entrada = f.read().decode().replace(' ', '')
 
@@ -298,5 +314,5 @@ criaautomatoGramatica()
 criaProducoesToken()
 determiniza()
 minimiza() 
-printAFD(0, 1, automato, listNTerm, "\n\nautomatô Finito Não Determinístico")
-printAFD(1, 0, automatoDet, estVisitOrd, "\n\nnautomatô Finito Minimo Determinístico")
+printAFD(0, 1, automato, listNTerm, "\n\n Automato Finito Não Determinístico")
+printAFD(1, 0, automatoDet, estVisitOrd, "\n\n Automato Finito Minimo Determinístico")
